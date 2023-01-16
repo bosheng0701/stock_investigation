@@ -12,10 +12,11 @@ def insert_html(value):
     # p_tag.string = value['realtime']['latest_trade_price']
     # soup.body.append(p_tag)
     json_type=json.dumps(value)
-    soup.body.append(json2html.convert(json = json.loads(json_type)))
-    print()
-    # with open("stock.html", "w") as file:
-    #     file.write(str(soup))
+    table = json2html.convert(json = json.loads(json_type))
+    table = table.replace("&gt;",">").replace("&lt;","<")
+    # soup.body.append(table)
+    with open("stock.html", "w") as file:
+        file.write(table)
 
 if __name__ == '__main__':
     # Matching by call auction every 3 minutes
