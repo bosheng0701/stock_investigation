@@ -4,18 +4,20 @@ import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
 import math
+import os
 
-
-# Initialise the data 
-long_MA = 10
-short_MA = 5
+# Initialize the data 
+long_MA = 5
+short_MA = 1
 initial_wealth = '10000'
 stock = '3231.TW'
 period = '30d'
-start_date =  '2022-10-01'
-end_date = '2023-01-12'
+start_date =  '2022-07-01'
+end_date = '2023-01-01'
 interval = '1d'
 totalprofit = 0
+
+
 
 def get_stock_data(stock,startdate,enddate,period,interval):
         ticker = stock  
@@ -180,6 +182,11 @@ def backtest(df,stock,startdate,enddate,initial_wealth) :
         print('Short MA Final Wealth: ${:,.2f}, Long MA Final Wealth: ${:,.2f}'.format(MA_wealth,LT_wealth))
         print('-'*100)
 
+        MA_gain_rate=round(float(MA_profitloss/int(initial_wealth))*100,2)
+        LT_gain_rate=round(float(LT_profitloss/int(initial_wealth))*100,2)
+        with open('profit.csv', 'a') as f:
+            f.write(stock+','+str(MA_gain_rate)+'%'+','+str(LT_gain_rate)+'%'+'\n')
+       
         return df
 
 
@@ -209,6 +216,8 @@ def graph(df,stock):
 
 
 if __name__ == '__main__':
+    os.remove('profit.csv')
+
     stock_list = pd.read_csv('stock_id.csv',sep=',', usecols=['stock_id'], squeeze=True)
     # yfinance get stock price
     for i in stock_list:
@@ -218,6 +227,6 @@ if __name__ == '__main__':
         print(stock)
         df = get_stock_data(stock,start_date,end_date,period,interval)
         df = ma_strategy(df,long_MA,short_MA)
-        # df = buy_sell_signals(df,stock,start_date,end_date)
-        # df = backtest(df,stock,start_date,end_date, initial_wealth)
+        df = buy_sell_signals(df,stock,start_date,end_date)
+        df = backtest(df,stock,start_date,end_date, initial_wealth)
         # graph(df,stock)
